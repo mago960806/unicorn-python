@@ -1,0 +1,9 @@
+db:
+  image: mongo
+web:
+  build: .
+  volumes: .:/open-unicorn
+  ports:
+    - 8888:8888
+  links:
+    - db
