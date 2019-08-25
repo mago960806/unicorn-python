@@ -1,9 +1,12 @@
 import requests
+from logging import getLogger
 
 from spider.db import MongoDB
-from spider.log import get_logger
 
-logger = get_logger('FileLogger')
+# from spider.log import get_logger
+
+# logger = get_logger('FileLogger')
+logger = getLogger(__file__)
 
 
 class TechCrunchSpider(object):
@@ -32,13 +35,17 @@ class TechCrunchSpider(object):
         except Exception as e:
             logger.error(e)
 
-    def save_to_db(self):
-        with MongoDB(host='127.0.0.1', port=27017, db_name='techcrunch', collection_name='unicorns') as db:
-            db.insert_many(self.get_unicorns()['entities'])
-            logger.info('数据写入成功')
+    def save_unicorns(self) -> None:
+        unicorns = self.get_unicorns()
+        with MongoDB(host='localhost', port=27017, db_name='techcrunch', collection_name='unicorns') as db:
+            if not db.find_one({'meta.updated_at': unicorns['meta']['updated_at']}):
+                db.insert_one(unicorns)
+                logger.info('数据写入成功')
+            else:
+                logger.info('数据已存在, 无需重复写入')
 
 
 if __name__ == '__main__':
     # Just for test
     spider = TechCrunchSpider()
-    spider.save_to_db()
+    spider.save_unicorns()
