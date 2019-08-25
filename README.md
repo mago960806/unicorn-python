@@ -34,6 +34,10 @@ pipenv install
 # 运行tornado后端
 python app.py
 ```
+# 简易后台运行
+```bash
+nohup python app.py &
+```
 
 # Docker
 ```bash
